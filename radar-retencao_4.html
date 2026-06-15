@@ -1,0 +1,1235 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar de Retenção · Conéctar</title>
+<style>
+:root{
+  --ink:#10362B;
+  --ink-soft:#51685D;
+  --ink-faint:#7E948A;
+  --bg:#F2F5F1;
+  --card:#FFFFFF;
+  --line:#E1E8E0;
+  --line-strong:#CBD7CC;
+  --green:#0BC07D;
+  --green-deep:#089A64;
+  --green-soft:#E2F7EE;
+  --coral:#F58561;
+  --coral-soft:#FDEDE6;
+  --st-critico:#8E1F12;
+  --st-risco:#DD4F3B;
+  --st-atencao:#DD9A1F;
+  --st-ok:#0BA56E;
+  --st-novo:#1791A3;
+  --st-critico-soft:#F7E4E1;
+  --st-risco-soft:#FBE9E5;
+  --st-atencao-soft:#FAF0DB;
+  --st-ok-soft:#E2F7EE;
+  --st-novo-soft:#E0F2F5;
+  --neutral-soft:#EDF1ED;
+  --shadow:0 1px 2px rgba(16,54,43,.05),0 6px 18px rgba(16,54,43,.06);
+  --shadow-lift:0 2px 4px rgba(16,54,43,.07),0 12px 30px rgba(16,54,43,.10);
+  --r-card:16px;
+  --r-input:10px;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  --font-display:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select{font:inherit;color:var(--ink)}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px;border-radius:6px}
+::selection{background:var(--green-soft)}
+.num{font-variant-numeric:tabular-nums}
+
+/* ============ Masthead ============ */
+.mast{background:#0D3429;color:#fff;position:relative;overflow:hidden}
+.mast::after{content:"";position:absolute;right:-60px;top:-90px;width:340px;height:340px;background:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 824 812"><path fill="%23FFFFFF" d="M673.6,200.9c0,0-115.3,482.1-487.7,397.6c-6.4-1.5-9.4-6-6.2-12.5c16.7-33.6,44.2-100.4,138-178.3c18.3-15.2,3.9-12-3.6-7.6c-84.9,50-121.1,95-147.1,152.3c-4.7,10.4-10.1,12.2-7.1-6C203.7,287.8,467.7,268.9,673.6,200.9z"/></svg>') no-repeat center/contain;opacity:.05;pointer-events:none}
+.mast-in{max-width:1280px;margin:0 auto;padding:22px 24px 50px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;z-index:1}
+.brand{display:flex;align-items:center;gap:13px}
+.brand svg{width:42px;height:42px;flex:none}
+.brand h1{font-family:var(--font-display);font-size:21px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+.brand p{font-size:12.5px;color:#A9C6B9;margin-top:2px}
+.mast-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.file-pill{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px;color:#A9C6B9;text-align:right}
+.file-pill strong{color:#fff;font-weight:600;font-size:12.5px;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-ghost{padding:7px 13px;border-radius:99px;border:1px solid rgba(255,255,255,.28);color:#fff;font-size:12.5px;font-weight:600;transition:background .15s,border-color .15s}
+.btn-ghost:hover{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.45)}
+
+/* ============ Shell ============ */
+.shell{max-width:1280px;margin:0 auto;padding:0 24px 56px}
+
+/* ============ Setup / dropzone ============ */
+.setup{margin-top:-26px}
+.drop{background:var(--card);border:1.5px dashed var(--line-strong);border-radius:var(--r-card);box-shadow:var(--shadow);padding:64px 32px;text-align:center;transition:border-color .15s,background .15s}
+.drop.over{border-color:var(--green);background:var(--green-soft)}
+.drop svg{width:54px;height:54px;margin-bottom:14px}
+.drop h2{font-family:var(--font-display);font-size:19px;font-weight:700;margin-bottom:6px}
+.drop p{color:var(--ink-soft);font-size:13.5px;max-width:480px;margin:0 auto 18px}
+.btn{display:inline-block;padding:10px 22px;border-radius:99px;background:var(--green);color:#fff;font-weight:650;font-size:14px;box-shadow:0 2px 8px rgba(11,192,125,.35);transition:background .15s,transform .12s}
+.btn:hover{background:var(--green-deep)}
+.btn:active{transform:scale(.98)}
+.drop .priv{margin-top:20px;margin-bottom:0;font-size:12px;color:var(--ink-faint)}
+.drop .err{margin-top:16px;margin-bottom:0;color:var(--st-risco);font-weight:600;font-size:13px}
+
+/* ============ KPIs ============ */
+.kpis{margin-top:-26px;display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.kpi{background:var(--card);border-radius:var(--r-card);box-shadow:var(--shadow);padding:15px 17px 13px;text-align:left;border:1.5px solid transparent;transition:box-shadow .15s,border-color .15s,transform .12s;position:relative}
+.kpi:hover{box-shadow:var(--shadow-lift)}
+.kpi:active{transform:scale(.99)}
+.kpi .lbl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint)}
+.kpi .val{font-family:var(--font-display);font-size:37px;font-weight:750;letter-spacing:-.02em;line-height:1.1;margin-top:3px;font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:12px;color:var(--ink-soft);margin-top:2px;min-height:17px}
+.kpi.on{border-color:var(--accent,var(--green))}
+.kpi .dot{position:absolute;top:17px;right:15px;width:8px;height:8px;border-radius:99px;background:var(--accent,transparent)}
+.kpi.k-acao{--accent:var(--st-risco)}
+.kpi.k-acao .val{color:var(--st-risco)}
+.kpi.k-atencao{--accent:var(--st-atencao)}
+.kpi.k-atencao .val{color:var(--st-atencao)}
+.kpi.k-ok{--accent:var(--st-ok)}
+.kpi.k-ok .val{color:var(--st-ok)}
+.kpi.k-novo{--accent:var(--st-novo)}
+.kpi.k-novo .val{color:var(--st-novo)}
+
+.distro{margin-top:12px;background:var(--card);border-radius:99px;box-shadow:var(--shadow);padding:5px;display:flex;gap:3px;height:22px}
+.distro button{border-radius:99px;min-width:8px;transition:opacity .15s,flex-grow .25s ease;opacity:.9}
+.distro button:hover{opacity:1}
+.distro button.dim{opacity:.25}
+
+/* ============ Toolbar ============ */
+.toolbar{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{flex:1;min-width:200px;position:relative}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--ink-faint);pointer-events:none}
+.search input{width:100%;padding:9px 13px 9px 35px;border:1px solid var(--line);border-radius:var(--r-input);background:var(--card);box-shadow:var(--shadow);font-size:13.5px}
+.search input::placeholder{color:var(--ink-faint)}
+.search input:focus{border-color:var(--coral);outline:none;box-shadow:0 0 0 3px rgba(245,133,97,.18)}
+select.sel{padding:9px 30px 9px 12px;border:1px solid var(--line);border-radius:var(--r-input);background:var(--card) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" fill="none" stroke="%2351685D" stroke-width="1.6" stroke-linecap="round"/></svg>') no-repeat right 11px center;box-shadow:var(--shadow);font-size:13px;appearance:none;-webkit-appearance:none;cursor:pointer;max-width:200px}
+select.sel:focus{border-color:var(--coral);outline:none;box-shadow:0 0 0 3px rgba(245,133,97,.18)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{padding:6.5px 13px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:12.5px;font-weight:600;color:var(--ink-soft);box-shadow:var(--shadow);transition:all .13s}
+.chip:hover{border-color:var(--line-strong);color:var(--ink)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip.on.c-prime{background:var(--coral);border-color:var(--coral)}
+.chip-sep{width:1px;height:18px;background:var(--line-strong);margin:0 3px}
+.btn-cfg{padding:8px 14px;border-radius:var(--r-input);border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow);font-size:12.5px;font-weight:600;color:var(--ink-soft);white-space:nowrap}
+.btn-cfg:hover{color:var(--ink);border-color:var(--line-strong)}
+.btn-cfg .num{color:var(--ink)}
+
+/* ============ Settings ============ */
+.settings{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);padding:18px 20px;display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:24px}
+.set-g h3{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:9px}
+.set-g .cur{font-family:var(--font-display);font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}
+.set-g .hint{font-size:12px;color:var(--ink-soft);margin-top:7px;line-height:1.4}
+input[type=range]{width:100%;margin-top:9px;accent-color:var(--green);height:22px}
+.hol-add{display:flex;gap:7px;margin-bottom:9px}
+.hol-add input[type=date]{flex:1;padding:7px 10px;border:1px solid var(--line);border-radius:var(--r-input);font-size:13px;background:#fff}
+.hol-add button{padding:7px 15px;border-radius:var(--r-input);background:var(--green);color:#fff;font-weight:650;font-size:13px}
+.hol-add button:hover{background:var(--green-deep)}
+.hol-list{display:flex;gap:6px;flex-wrap:wrap}
+.hol-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 7px 4px 11px;border-radius:99px;background:var(--neutral-soft);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.hol-tag button{width:17px;height:17px;border-radius:99px;background:rgba(16,54,43,.10);font-size:11px;line-height:1;display:grid;place-items:center;color:var(--ink-soft)}
+.hol-tag button:hover{background:var(--st-risco);color:#fff}
+.hol-empty{font-size:12.5px;color:var(--ink-faint)}
+
+/* ============ Blocks ============ */
+.blocks{margin-top:18px;display:flex;flex-direction:column;gap:14px}
+.block{background:var(--card);border-radius:var(--r-card);box-shadow:var(--shadow);overflow:hidden}
+.blk-h{width:100%;display:flex;align-items:center;gap:10px;padding:14px 18px;text-align:left}
+.blk-h:hover{background:#FAFCFA}
+.blk-h .car{width:18px;height:18px;border-radius:6px;display:grid;place-items:center;color:var(--ink-faint);transition:transform .18s}
+.block.open .blk-h .car{transform:rotate(90deg)}
+.blk-h .ttl{font-size:13px;font-weight:750;letter-spacing:.05em;text-transform:uppercase}
+.blk-h .cnt{font-size:12.5px;font-weight:700;padding:2px 9px;border-radius:99px;font-variant-numeric:tabular-nums}
+.blk-h .desc{font-size:12px;color:var(--ink-faint);margin-left:auto}
+.blk-body{display:none;border-top:1px solid var(--line)}
+.block.open .blk-body{display:block}
+.blk-empty{padding:22px 18px;font-size:13px;color:var(--ink-faint)}
+
+/* ============ Table ============ */
+.tscroll{overflow-x:auto}
+.thead,.row{display:grid;grid-template-columns:30px minmax(210px,1.5fr) 50px 136px 78px 92px 86px 84px 94px minmax(200px,1.7fr);gap:8px;align-items:center;min-width:1080px}
+.thead{padding:8px 18px 8px 12px;border-bottom:1px solid var(--line);background:#FBFCFB}
+.thead button{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);text-align:left;display:flex;align-items:center;gap:3px;padding:2px 0}
+.thead button:hover{color:var(--ink)}
+.thead button.on{color:var(--ink)}
+.thead button .arr{font-size:9px}
+.rowwrap{border-bottom:1px solid var(--line)}
+.rowwrap:last-child{border-bottom:none}
+.row{width:100%;padding:9px 18px 9px 12px;text-align:left;position:relative;transition:background .12s;cursor:pointer}
+.row::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:4px;border-radius:0 4px 4px 0;background:var(--stc,transparent)}
+.row:hover{background:#FAFCFA}
+.row.is-prime{background:linear-gradient(90deg,rgba(245,133,97,.055),rgba(245,133,97,.015))}
+.row.is-prime:hover{background:linear-gradient(90deg,rgba(245,133,97,.10),rgba(245,133,97,.03))}
+.row .car{width:17px;height:17px;color:var(--ink-faint);transition:transform .18s;display:grid;place-items:center}
+.row.open>.car,.row.open .car{transform:rotate(90deg)}
+.cell-name{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cell-name .nm{display:flex;align-items:center;gap:6px;font-weight:650;font-size:13.5px;min-width:0}
+.cell-name .nm .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.star{color:var(--coral);font-size:13px;flex:none}
+.cell-name .tags{display:flex;gap:5px;flex-wrap:wrap}
+.tag{font-size:10.5px;font-weight:700;padding:1.5px 8px;border-radius:99px;white-space:nowrap}
+.tag-prime{background:var(--coral);color:#fff}
+.tag-grupo{background:var(--neutral-soft);color:var(--ink-soft)}
+.tag-resp{background:#EAF1FB;color:#2D5A9E}
+.tag-plus{background:var(--green-soft);color:var(--green-deep)}
+.tag-units{background:var(--ink);color:#fff}
+.tier{display:inline-grid;place-items:center;min-width:34px;padding:3px 7px;border-radius:8px;font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.tier-G{background:var(--ink);color:#fff}
+.tier-MP{background:#3E6B5B;color:#fff}
+.tier-MM{background:#7FA396;color:#fff}
+.tier-P{background:var(--neutral-soft);color:var(--ink-soft)}
+.cell{font-size:12.5px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.cell strong{color:var(--ink);font-weight:650}
+.cell.up{color:var(--st-ok);font-weight:650}
+.cell.down{color:var(--st-risco);font-weight:650}
+.cell-sinal{font-size:12.5px;color:var(--ink-soft);display:flex;flex-direction:column;gap:4px}
+.cell-sinal .s-txt{line-height:1.35}
+.cell-sinal .s-txt b{color:var(--ink);font-weight:650}
+.sev-chips{display:flex;gap:4px;flex-wrap:wrap}
+.sev{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:99px;white-space:nowrap}
+.sev-extremo{background:var(--st-critico);color:#fff}
+.sev-grave{background:var(--st-risco-soft);color:var(--st-critico)}
+.sev-medio{background:var(--st-atencao-soft);color:#8A5E0A}
+.sev-leve{background:var(--neutral-soft);color:var(--ink-soft)}
+.sev-cliente{background:#EEF0F4;color:#5B6470}
+.sev-combinado{background:var(--st-novo-soft);color:#0E6B7A}
+.pulse{color:var(--ink-soft);display:block}
+
+/* group children */
+.units{background:#F8FAF8;border-top:1px solid var(--line)}
+.units .rowwrap{border-bottom:1px solid var(--line)}
+.units .row{padding-left:34px}
+.units .row::after{content:"";position:absolute;left:21px;top:0;bottom:0;width:1.5px;background:var(--line-strong)}
+.units .row::before{left:22px;border-radius:4px}
+
+/* drilldown */
+.drill{padding:6px 18px 18px 42px;background:#F8FAF8;border-top:1px dashed var(--line)}
+.units .drill{padding-left:56px}
+.drill-grid{display:grid;grid-template-columns:minmax(230px,1fr) 2fr;gap:22px;padding-top:12px}
+.drill h4{font-size:11px;font-weight:750;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:9px}
+.facts{display:flex;flex-direction:column;gap:6px}
+.fact{display:flex;justify-content:space-between;gap:14px;font-size:12.5px;border-bottom:1px dotted var(--line);padding-bottom:5px}
+.fact span{color:var(--ink-faint)}
+.fact b{font-weight:650;font-variant-numeric:tabular-nums;text-align:right}
+.fals{display:flex;flex-direction:column;gap:9px;max-height:320px;overflow-y:auto;padding-right:6px}
+.fal{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 13px}
+.fal-h{display:flex;align-items:center;gap:9px;margin-bottom:5px;flex-wrap:wrap}
+.fal-h .fd{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.fal-h .ff{font-size:11.5px;color:var(--ink-faint);font-weight:600}
+.fal-obs{font-size:12.5px;color:var(--ink-soft);margin-top:5px;line-height:1.4}
+.fal-none{font-size:13px;color:var(--ink-faint);padding:8px 2px}
+
+/* footer */
+.legend{margin-top:20px;display:flex;gap:18px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--ink-soft)}
+.legend .li{display:flex;align-items:center;gap:6px}
+.legend .sw{width:10px;height:10px;border-radius:3px}
+.legend .note{margin-left:auto;color:var(--ink-faint)}
+
+/* KPI GMV em risco */
+.kpi.k-gmv{--accent:var(--st-critico)}
+.kpi.k-gmv .val{color:var(--st-critico);font-size:29px}
+
+/* Roteamento de churn */
+.tag-contagio{background:var(--st-critico);color:#fff}
+.tag-absorcao{background:var(--st-novo-soft);color:var(--st-novo)}
+.row.is-absorcao .cell-name .txt{opacity:.72}
+.route-note{margin:0 0 14px;padding:11px 14px;border-radius:10px;font-size:12.5px;line-height:1.45}
+.route-note b{font-weight:750}
+.rn-contagio{background:var(--st-critico-soft);color:var(--st-critico)}
+.rn-absorcao{background:var(--st-novo-soft);color:var(--st-novo)}
+.rn-falhag{background:var(--st-atencao-soft);color:#8a5a06}
+
+/* Cobertura por responsável */
+.cover-wrap{margin-top:12px;background:var(--card);border-radius:var(--r-card);box-shadow:var(--shadow);overflow:hidden}
+.cover-h{display:flex;align-items:center;gap:10px;width:100%;padding:13px 16px;text-align:left}
+.cover-h .car{width:18px;height:18px;display:grid;place-items:center;color:var(--ink-faint);transition:transform .18s}
+.cover-wrap.open .cover-h .car{transform:rotate(90deg)}
+.cover-h .ttl{font-family:var(--font-display);font-weight:700;font-size:14px}
+.cover-h .desc{font-size:12px;color:var(--ink-faint);margin-left:auto}
+.cover-h:hover .ttl{color:var(--ink)}
+.cover-body{border-top:1px solid var(--line);overflow-x:auto}
+.cover-tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}
+.cover-tbl th{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);text-align:right;padding:9px 14px;background:#FBFCFB;border-bottom:1px solid var(--line)}
+.cover-tbl th:first-child{text-align:left}
+.cover-tbl td{padding:9px 14px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+.cover-tbl tbody tr:last-child td{border-bottom:none}
+.cover-tbl td.c-resp{text-align:left;font-weight:600;color:var(--ink)}
+.cover-tbl tbody tr{cursor:pointer}
+.cover-tbl tbody tr:hover{background:var(--bg)}
+.cover-tbl td.c-crit{color:var(--st-critico);font-weight:750}
+.cover-tbl td.c-risc{color:var(--st-risco);font-weight:750}
+.cover-tbl td.c-att{color:var(--st-atencao);font-weight:750}
+.cover-tbl td.c-gmv{font-weight:750;color:var(--ink)}
+.cover-tbl tr.cover-none td.c-resp{color:var(--ink-faint)}
+
+@media (max-width:1240px){
+  .thead,.row{grid-template-columns:30px minmax(200px,1.5fr) 50px 136px 78px 92px 84px 94px minmax(180px,1.6fr);min-width:960px}
+  .col-entrega{display:none}
+}
+@media (max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}.settings{grid-template-columns:1fr 1fr}}
+@media (max-width:760px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .settings{grid-template-columns:1fr}
+  .mast-in{padding:18px 16px 44px}
+  .shell{padding:0 12px 40px}
+  .drill-grid{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-in">
+    <div class="brand">
+      <svg viewBox="0 0 824 812" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="#0BC07D" d="M673.6,200.9c0,0-115.3,482.1-487.7,397.6c-6.4-1.5-9.4-6-6.2-12.5c16.7-33.6,44.2-100.4,138-178.3c18.3-15.2,3.9-12-3.6-7.6c-84.9,50-121.1,95-147.1,152.3c-4.7,10.4-10.1,12.2-7.1-6C203.7,287.8,467.7,268.9,673.6,200.9z"/></svg>
+      <div>
+        <h1>Radar de Retenção</h1>
+        <p>Conéctar · cadência, volume e falhas</p>
+      </div>
+    </div>
+    <div class="mast-meta" id="mastMeta" hidden>
+      <div class="file-pill">
+        <strong id="metaFile"></strong>
+        <span id="metaInfo"></span>
+      </div>
+      <button class="btn-ghost" id="btnSwap">Trocar arquivo</button>
+    </div>
+  </div>
+</header>
+
+<main class="shell">
+
+  <!-- Setup -->
+  <section class="setup" id="setup">
+    <div class="drop" id="dropZone">
+      <svg viewBox="0 0 824 812" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="#0BC07D" opacity=".85" d="M673.6,200.9c0,0-115.3,482.1-487.7,397.6c-6.4-1.5-9.4-6-6.2-12.5c16.7-33.6,44.2-100.4,138-178.3c18.3-15.2,3.9-12-3.6-7.6c-84.9,50-121.1,95-147.1,152.3c-4.7,10.4-10.1,12.2-7.1-6C203.7,287.8,467.7,268.9,673.6,200.9z"/></svg>
+      <h2>Arraste o CSV de pedidos aqui</h2>
+      <p>Use a exportação de pedidos do Airtable. O radar lê a cadência de compra, a tendência de volume e as falhas recentes de cada cliente e mostra quem precisa de ação hoje.</p>
+      <button class="btn" id="btnPick">Escolher arquivo</button>
+      <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
+      <p class="priv">Tudo roda no seu navegador. Nada é enviado para fora.</p>
+      <p class="err" id="loadErr" hidden></p>
+    </div>
+  </section>
+
+  <!-- Board -->
+  <section id="board" hidden>
+
+    <div class="kpis" id="kpis"></div>
+    <div class="distro" id="distro" role="group" aria-label="Distribuição por status"></div>
+
+    <div class="cover-wrap" id="coverWrap">
+      <button class="cover-h" id="btnCover" aria-expanded="false">
+        <span class="car"><svg width="9" height="11" viewBox="0 0 9 11" fill="currentColor"><path d="M1 1.3v8.4c0 .8.9 1.3 1.6.8l6-4.2c.6-.4.6-1.3 0-1.7l-6-4.2C1.9 0 1 .5 1 1.3z"/></svg></span>
+        <span class="ttl">Cobertura por responsável</span>
+        <span class="desc">carteira inteira · visão de liderança</span>
+      </button>
+      <div class="cover-body" id="coverBody" hidden></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="search" id="q" placeholder="Buscar cliente, ID ou grupo" aria-label="Buscar cliente, ID ou grupo">
+      </div>
+      <select class="sel" id="selResp" aria-label="Filtrar por responsável"></select>
+      <select class="sel" id="selGrupo" aria-label="Filtrar por grupo"></select>
+      <div class="chips" id="chips"></div>
+      <button class="btn-cfg" id="btnCfg" aria-expanded="false">Ajustes · <span class="num" id="cfgSummary"></span></button>
+    </div>
+
+    <div class="settings" id="settings" hidden>
+      <div class="set-g">
+        <h3>Multiplicador de cadência</h3>
+        <div class="cur"><span id="multVal"></span>x a cadência do cliente</div>
+        <input type="range" id="multRange" min="1" max="3" step="0.1" value="1.5" aria-label="Multiplicador de cadência">
+        <p class="hint">Cliente vira "fora de cadência" quando passa esse múltiplo da cadência base sem pedir. Piso de base + 1 dia para quem pede todo dia.</p>
+      </div>
+      <div class="set-g">
+        <h3>Limiar de queda de volume</h3>
+        <div class="cur">queda de <span id="dropVal"></span>%</div>
+        <input type="range" id="dropRange" min="20" max="80" step="5" value="50" aria-label="Limiar de queda de volume">
+        <p class="hint">Compara as últimas 4 semanas com as 4 anteriores. Metade desse limiar já marca o cliente como "em atenção".</p>
+      </div>
+      <div class="set-g">
+        <h3>Dias sem entrega (feriados)</h3>
+        <div class="hol-add">
+          <input type="date" id="holDate" aria-label="Data sem entrega">
+          <button id="holAdd">Adicionar</button>
+        </div>
+        <div class="hol-list" id="holList"></div>
+        <p class="hint">Datas marcadas aqui são descontadas da cadência e dos dias sem pedir de todos os clientes.</p>
+      </div>
+    </div>
+
+    <div class="blocks" id="blocks"></div>
+
+    <div class="legend" id="legend">
+      <span class="li"><span class="sw" style="background:var(--st-critico)"></span>Crítico</span>
+      <span class="li"><span class="sw" style="background:var(--st-risco)"></span>Risco</span>
+      <span class="li"><span class="sw" style="background:var(--st-atencao)"></span>Atenção</span>
+      <span class="li"><span class="sw" style="background:var(--st-ok)"></span>Na cadência</span>
+      <span class="li"><span class="sw" style="background:var(--st-novo)"></span>Novo</span>
+      <span class="li"><span class="star">★</span>Prime</span>
+      <span class="note" id="legendNote"></span>
+    </div>
+
+  </section>
+</main>
+
+<script>
+/*__CORE__*/
+'use strict';
+const DAY = 86400000;
+
+function stripBOM(t){ return t.charCodeAt(0) === 0xFEFF ? t.slice(1) : t; }
+
+function parseCSV(text){
+  const rows = []; let row = [], field = '', inQ = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i];
+    if (inQ){
+      if (c === '"'){ if (text[i+1] === '"'){ field += '"'; i++; } else inQ = false; }
+      else field += c;
+    } else {
+      if (c === '"') inQ = true;
+      else if (c === ','){ row.push(field); field = ''; }
+      else if (c === '\n'){ row.push(field); field = ''; if (row.length > 1 || row[0] !== '') rows.push(row); row = []; }
+      else if (c !== '\r') field += c;
+    }
+  }
+  if (field !== '' || row.length){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+function dayFromBR(s){
+  if (!s) return null;
+  const m = s.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return null;
+  return Math.round(Date.UTC(+m[3], +m[2]-1, +m[1]) / DAY);
+}
+function dayFromISO(s){
+  const m = (s||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return null;
+  return Math.round(Date.UTC(+m[1], +m[2]-1, +m[3]) / DAY);
+}
+function fmtDay(d, withYear){
+  if (d == null) return 'n/d';
+  const dt = new Date(d * DAY);
+  const dd = String(dt.getUTCDate()).padStart(2,'0');
+  const mm = String(dt.getUTCMonth()+1).padStart(2,'0');
+  return withYear ? dd+'/'+mm+'/'+dt.getUTCFullYear() : dd+'/'+mm;
+}
+function parseMoney(s){
+  if (!s) return 0;
+  const n = parseFloat(String(s).replace(/[R$\s,]/g, m => m === ',' ? '' : ''));
+  return isNaN(n) ? 0 : n;
+}
+function median(arr){
+  if (!arr.length) return null;
+  const a = [...arr].sort((x,y)=>x-y);
+  const mid = a.length >> 1;
+  return a.length % 2 ? a[mid] : (a[mid-1]+a[mid])/2;
+}
+
+/* Taxonomia de gravidade */
+const SEV_MAP = (() => {
+  const m = new Map();
+  const add = (lvl, arr) => arr.forEach(t => m.set(t.toLowerCase(), lvl));
+  add('extremo', ['pedido não entregue']);
+  add('grave', ['pedido atrasado acima de 1h30m','pedido atrasado acima de 30m e até 1h30m','retirou item da nota fiscal','dificuldade no contato com fornecedor','itens faltantes grave','pedido deixado na porta','itens em má qualidade grave','reposição de mais de 5 itens no mesmo dia','desconto de pedido não entregue']);
+  add('medio', ['pedido atrasado até 30m','itens em má qualidade médio','itens faltantes médio','reposição de 2 a 5 itens no mesmo dia','recibo de entrega faltante']);
+  add('leve', ['problemas de processo fornecedor (falta de nf, recibo, boleto, etc)','problemas de processo fornecedor','itens em má qualidade leve','itens faltantes leve','pedido não atendeu expectativas do cliente','reposição de até 2 itens no mesmo dia','boleto faltante','nf faltante','outros']);
+  add('cliente', ['problema do cliente','atraso do cliente','cliente pediu errado','erro operacional conéctar']);
+  add('combinado', ['reposição combinada']);
+  return m;
+})();
+function sevOf(tipo){ return SEV_MAP.get(tipo.trim().toLowerCase()) || 'leve'; }
+const SEV_LABEL = { extremo:'Extremo', grave:'Grave', medio:'Médio', leve:'Leve', cliente:'Cliente', combinado:'Combinado' };
+
+/* Lê o CSV bruto e monta o dataset por cliente */
+function buildDataset(text){
+  const rows = parseCSV(stripBOM(text));
+  if (rows.length < 2) return { error: 'O arquivo está vazio ou não tem linhas de dados.' };
+  const head = rows[0].map(h => h.trim());
+  const find = name => head.findIndex(h => h.toLowerCase() === name.toLowerCase());
+  const ix = {
+    id: find('ID_Cliente'),
+    nome: find('Cliente'),
+    data: find('Data Pedido'),
+    entrega: find('Data Entrega'),
+    total: find('Total Conéctar'),
+    status: find('Status Pedido'),
+    plus: find('Conéctar+'),
+    obs: find('Obs Conéctar'),
+    prob: find('Problema'),
+    forn: find('Nome'),
+    grupo: find('Negociação unificada'),
+    prime: find('Prime'),
+    resp: head.findIndex(h => /^resp/i.test(h))
+  };
+  const missing = ['id','data','total'].filter(k => ix[k] === -1)
+    .map(k => ({id:'ID_Cliente', data:'Data Pedido', total:'Total Conéctar'})[k]);
+  if (missing.length) return { error: 'Colunas obrigatórias não encontradas: ' + missing.join(', ') + '.' };
+
+  const clients = new Map();
+  let maxDay = null, used = 0, ignored = 0;
+  for (let r = 1; r < rows.length; r++){
+    const row = rows[r];
+    const st = ix.status > -1 ? (row[ix.status]||'').trim() : '';
+    if (st === 'Teste' || st === 'Recusado'){ ignored++; continue; }
+    const id = (row[ix.id]||'').trim();
+    const day = dayFromBR(row[ix.data]);
+    if (!id || day == null){ ignored++; continue; }
+    used++;
+    if (maxDay == null || day > maxDay) maxDay = day;
+    let c = clients.get(id);
+    if (!c){
+      c = { id, nome:'', orders:[], prime:false, plus:false, resp:'', grupo:'' };
+      clients.set(id, c);
+    }
+    const nome = ix.nome > -1 ? (row[ix.nome]||'').trim() : '';
+    if (nome) c.nome = nome;
+    const resp = ix.resp > -1 ? (row[ix.resp]||'').trim() : '';
+    if (resp) c.resp = resp;
+    const grupo = ix.grupo > -1 ? (row[ix.grupo]||'').trim() : '';
+    if (grupo) c.grupo = grupo;
+    if (ix.prime > -1 && (row[ix.prime]||'').trim().startsWith('1')) c.prime = true;
+    const plus = ix.plus > -1 && (row[ix.plus]||'').trim() !== '';
+    if (plus) c.plus = true;
+    c.orders.push({
+      day,
+      eday: ix.entrega > -1 ? dayFromBR(row[ix.entrega]) : null,
+      total: parseMoney(row[ix.total]),
+      prob: ix.prob > -1 ? (row[ix.prob]||'').trim() : '',
+      obs: ix.obs > -1 ? (row[ix.obs]||'').trim() : '',
+      forn: ix.forn > -1 ? (row[ix.forn]||'').trim() : ''
+    });
+  }
+  if (maxDay == null) return { error: 'Nenhum pedido válido encontrado no arquivo.' };
+  return { clients, maxDay, used, ignored };
+}
+
+/* Cálculos por cliente, sensíveis aos ajustes */
+function effGap(a, b, hol){
+  let g = b - a;
+  hol.forEach(h => { if (h > a && h < b) g--; });
+  return Math.max(1, g);
+}
+function effSince(last, cutoff, hol){
+  let g = cutoff - last;
+  hol.forEach(h => { if (h > last && h <= cutoff) g--; });
+  return Math.max(0, g);
+}
+const ST_RANK = { critico:5, risco:4, atencao:3, novo:2, ok:1 };
+const TIER_RANK = { 'G':4, 'M+':3, 'M-':2, 'P':1 };
+function tierOf(gmv){
+  if (gmv == null) return null;
+  if (gmv > 12000) return 'G';
+  if (gmv > 6000) return 'M+';
+  if (gmv > 4000) return 'M-';
+  return 'P';
+}
+
+function computeClient(c, cutoff, maxDay, opts){
+  const { mult, drop, holidays } = opts;
+  const all = c.orders;
+  const past = all.filter(o => o.day <= cutoff);
+  const m = {
+    id: c.id, nome: c.nome || c.id, prime: c.prime, plus: c.plus,
+    resp: c.resp, grupo: c.grupo, type: 'client'
+  };
+  /* falhas: janela de 14 dias até hoje (inclui o dia corrente, falha é acionável) */
+  m.failures = all.filter(o => o.prob && o.day > maxDay - 14)
+    .sort((a,b) => b.day - a.day)
+    .map(o => ({ day:o.day, forn:o.forn, obs:o.obs, tipos:o.prob.split(',').map(s=>s.trim()).filter(Boolean) }));
+  m.sevCount = { extremo:0, grave:0, medio:0, leve:0 };
+  m.failures.forEach(f => f.tipos.forEach(t => {
+    const s = sevOf(t);
+    if (m.sevCount[s] != null) m.sevCount[s]++;
+  }));
+
+  if (!past.length){
+    Object.assign(m, { days:[], base:null, since:0, last:null, lastDeliv:null, gmvMonth:null,
+      tier:null, delta:null, recent:0, prev:0, hist:0, status:'novo',
+      gravePlus: m.sevCount.extremo + m.sevCount.grave, failBoost:0,
+      sinal:'Primeiro pedido feito hoje. Sem histórico antes do corte.' });
+    m.urg = ST_RANK.novo * 1000;
+    return m;
+  }
+
+  const daySet = new Set(); past.forEach(o => daySet.add(o.day));
+  const days = [...daySet].sort((a,b)=>a-b);
+  m.days = days;
+  const gaps = [];
+  for (let i = 1; i < days.length; i++) gaps.push(effGap(days[i-1], days[i], holidays));
+  const base = median(gaps);
+  m.base = base;
+  const last = days[days.length-1];
+  m.last = last;
+  m.since = effSince(last, cutoff, holidays);
+  m.lastDeliv = past.reduce((mx,o) => o.eday != null && (mx == null || o.eday > mx) ? o.eday : mx, null);
+
+  const first = days[0];
+  m.hist = cutoff - first + 1;
+  let recent = 0, prev = 0;
+  past.forEach(o => {
+    if (o.day > cutoff - 28) recent += o.total;
+    else if (o.day > cutoff - 56) prev += o.total;
+  });
+  m.recent = recent; m.prev = prev;
+  m.delta = prev > 0 ? (recent - prev) / prev : null;
+
+  const totalSum = past.reduce((s,o) => s + o.total, 0);
+  const months = Math.max(0.5, m.hist / 30.44);
+  m.gmvMonth = totalSum / months;
+  m.tier = tierOf(m.gmvMonth);
+
+  const threshold = base != null ? Math.max(base * mult, base + 1) : null;
+  m.threshold = threshold;
+  const fora = threshold != null && m.since > threshold;
+  const late = base != null && m.since > base && !fora;
+  const quedaForte = m.delta != null && m.delta <= -drop;
+  const quedaMod = m.delta != null && m.delta <= -drop/2 && !quedaForte;
+
+  const fmt1 = n => (Math.round(n*10)/10).toLocaleString('pt-BR');
+  const pct = d => Math.abs(Math.round(d*100)) + '%';
+
+  if (m.hist < 30){
+    m.status = 'novo';
+    m.sinal = 'Cliente novo, ' + m.hist + 'd de histórico' +
+      (base != null ? '. Cadência observada de ' + fmt1(base) + 'd' : '. Ainda sem cadência definida') +
+      (m.since > 0 ? '. Último pedido há ' + m.since + 'd' : '. Pediu no dia do corte') + '.';
+  } else if (base == null){
+    if (m.since >= 15){ m.status = 'risco'; m.sinal = 'Pediu uma única vez e está parado há ' + m.since + 'd. Sem cadência para comparar.'; }
+    else if (m.since >= 7){ m.status = 'atencao'; m.sinal = 'Pediu uma única vez, há ' + m.since + 'd. Cadência ainda em formação.'; }
+    else { m.status = 'ok'; m.sinal = 'Pediu uma única vez, há ' + m.since + 'd.'; }
+  } else if (fora && quedaForte){
+    m.status = 'critico';
+    m.sinal = 'Fora de cadência (' + m.since + 'd parado, limite ' + fmt1(threshold) + 'd) e volume caiu ' + pct(m.delta) + ' nas últimas 4 semanas.';
+  } else if (fora){
+    m.status = 'risco';
+    m.sinal = 'Fora de cadência: ' + m.since + 'd sem pedir. Costuma pedir a cada ' + fmt1(base) + 'd (limite ' + fmt1(threshold) + 'd).';
+  } else if (quedaForte){
+    m.status = 'risco';
+    m.sinal = 'Queda forte de volume: ' + pct(m.delta) + ' abaixo das 4 semanas anteriores. Cadência segue normal.';
+  } else if (late && quedaMod){
+    m.status = 'atencao';
+    m.sinal = 'Escorregando: ' + m.since + 'd sem pedir (base ' + fmt1(base) + 'd) e volume caiu ' + pct(m.delta) + '.';
+  } else if (late){
+    m.status = 'atencao';
+    m.sinal = 'Atrasando: ' + m.since + 'd sem pedir, acima da base de ' + fmt1(base) + 'd. Ainda dentro do limite de ' + fmt1(threshold) + 'd.';
+  } else if (quedaMod){
+    m.status = 'atencao';
+    m.sinal = 'Volume caiu ' + pct(m.delta) + ' nas últimas 4 semanas. Cadência segue normal.';
+  } else {
+    m.status = 'ok';
+    m.sinal = 'No ritmo: pede a cada ' + fmt1(base) + 'd, último há ' + m.since + 'd' +
+      (m.delta != null && m.delta > 0.05 ? '. Volume subiu ' + pct(m.delta) : '') + '.';
+  }
+
+  const ratio = threshold != null ? Math.min(m.since / threshold, 8) : Math.min(m.since / 15, 8);
+  m.gravePlus = m.sevCount.extremo + m.sevCount.grave;
+  let failBoost = 0;
+  if (m.gravePlus > 0){
+    const w = m.tier === 'G' ? 120 : m.tier === 'M+' ? 50 : 20;
+    failBoost = Math.min(m.gravePlus, 4) * w;
+  }
+  m.failBoost = failBoost;
+  m.urg = ST_RANK[m.status] * 1000 + ratio * 50 + Math.log10((m.gmvMonth||0) + 1) + failBoost;
+  return m;
+}
+
+/* Consolida unidades visíveis de um grupo em uma entidade */
+function consolidateGroup(name, units){
+  const g = { type:'group', id:'g:'+name, nome:name, units, prime: units.some(u=>u.prime), plus: units.some(u=>u.plus) };
+  const resps = [...new Set(units.map(u=>u.resp).filter(Boolean))];
+  g.resp = resps.join(', ');
+  g.grupo = name;
+  g.gmvMonth = units.reduce((s,u)=> s + (u.gmvMonth||0), 0);
+  g.tier = tierOf(g.gmvMonth);
+  let worst = null;
+  units.forEach(u => { if (!worst || ST_RANK[u.status] > ST_RANK[worst.status]) worst = u; });
+  g.status = worst ? worst.status : 'ok';
+  g.since = Math.min(...units.map(u=>u.since));
+  g.last = units.reduce((mx,u)=> u.last != null && (mx==null || u.last>mx) ? u.last : mx, null);
+  g.lastDeliv = units.reduce((mx,u)=> u.lastDeliv != null && (mx==null || u.lastDeliv>mx) ? u.lastDeliv : mx, null);
+  const recent = units.reduce((s,u)=>s+u.recent,0), prev = units.reduce((s,u)=>s+u.prev,0);
+  g.delta = prev > 0 ? (recent-prev)/prev : null;
+  g.base = null;
+  const ds = new Set(); units.forEach(u => u.days.forEach(d=>ds.add(d)));
+  g.days = [...ds].sort((a,b)=>a-b);
+  g.sevCount = { extremo:0, grave:0, medio:0, leve:0 };
+  units.forEach(u => { for (const k in g.sevCount) g.sevCount[k] += u.sevCount[k]; });
+  g.failures = [];
+  g.contagion = units.some(u => u.groupContagion);
+  const nAct = units.filter(u => u.status==='critico'||u.status==='risco').length;
+  const nAtt = units.filter(u => u.status==='atencao').length;
+  const parts = [];
+  if (nAct) parts.push(nAct + (nAct>1?' unidades precisam':' unidade precisa') + ' de ação');
+  if (nAtt) parts.push(nAtt + ' em atenção');
+  g.sinal = (g.contagion ? 'Contágio de grupo: ' + nAct + ' unidades fora de cadência ao mesmo tempo, escalar ao decisor do grupo. ' : '') +
+    'Grupo com ' + units.length + ' unidade' + (units.length>1?'s':'') +
+    (parts.length ? ': ' + parts.join(', ') : ', todas no ritmo') +
+    '. Pior unidade: ' + (worst ? worst.nome : 'n/d') + '.';
+  g.urg = Math.max(...units.map(u=>u.urg)) + 0.5 + (g.contagion ? 500 : 0);
+  return g;
+}
+
+/* Roteador de churn: separa contágio de grupo e absorção por unidade irmã.
+   Roda sobre todas as unidades (visão completa), independente de filtros. */
+function routeGroups(metrics){
+  const byG = new Map();
+  metrics.forEach(u => {
+    u.route = null; u.routeNote = ''; u.groupContagion = false;
+    if (u.grupo){ if (!byG.has(u.grupo)) byG.set(u.grupo, []); byG.get(u.grupo).push(u); }
+  });
+  byG.forEach(units => {
+    if (units.length < 2) return;
+    const risk = units.filter(u => u.status==='critico' || u.status==='risco');
+    if (!risk.length) return;
+    const healthy = units.filter(u => u.status==='ok');
+    if (risk.length >= 2 && risk.length > healthy.length){
+      /* saída coordenada: várias unidades caindo juntas e nenhuma irmã segurando a demanda */
+      risk.forEach(u => { u.groupContagion = true; });
+    } else if (healthy.length){
+      /* absorção: unidade parada mas tem irmã ativa pedindo, provável falso positivo */
+      const ref = healthy.slice().sort((a,b)=> a.since - b.since)[0];
+      risk.forEach(u => {
+        u.route = 'absorcao';
+        u.routeNote = 'Irmã ativa no grupo (' + ref.nome + ', pediu há ' + ref.since + 'd). A demanda pode ter migrado entre unidades. Confirmar antes de tratar como churn de retenção.';
+      });
+    }
+  });
+}
+/*__ENDCORE__*/
+
+/* ===================== UI ===================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtBRL = v => v == null ? 'n/d' : 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+const fmtBRLk = v => {
+  if (!v) return 'R$ 0';
+  if (v >= 1e6) return 'R$ ' + (v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1}) + ' mi';
+  if (v >= 1000) return 'R$ ' + Math.round(v/1000) + 'k';
+  return 'R$ ' + Math.round(v);
+};
+const fmt1 = n => (Math.round(n*10)/10).toLocaleString('pt-BR');
+const fmtInt = n => n.toLocaleString('pt-BR');
+
+const state = {
+  ds: null, cutoff: null, fileName: '',
+  mult: 1.5, drop: 0.5, holidays: new Set(),
+  metrics: [],
+  q: '', resp: '', grupo: '',
+  chips: new Set(), statusFilter: new Set(),
+  sort: { key: 'urg', dir: -1 },
+  openBlocks: new Set(['acao','atencao']),
+  openGroups: new Set(), openDrill: new Set(), coverOpen: false
+};
+
+const BLOCKS = [
+  { key:'acao',    title:'Precisam de ação', statuses:['critico','risco'], col:'var(--st-risco)',  soft:'var(--st-risco-soft)',  desc:'fora de cadência ou queda forte de volume' },
+  { key:'atencao', title:'Em atenção',       statuses:['atencao'],         col:'var(--st-atencao)', soft:'var(--st-atencao-soft)', desc:'começando a escorregar' },
+  { key:'novo',    title:'Clientes novos',   statuses:['novo'],            col:'var(--st-novo)',    soft:'var(--st-novo-soft)',    desc:'menos de 30 dias de histórico' },
+  { key:'ok',      title:'Na cadência',      statuses:['ok'],              col:'var(--st-ok)',      soft:'var(--st-ok-soft)',      desc:'dentro do padrão de compra' }
+];
+const ST_OF_BLOCK = {}; BLOCKS.forEach(b => b.statuses.forEach(s => ST_OF_BLOCK[s] = b));
+const CHIP_DEFS = [
+  { cat:'tier', key:'tier:G',  label:'G'  }, { cat:'tier', key:'tier:M+', label:'M+' },
+  { cat:'tier', key:'tier:M-', label:'M−' }, { cat:'tier', key:'tier:P',  label:'P'  },
+  { sep:true },
+  { cat:'prime', key:'prime:1', label:'★ Prime', cls:'c-prime' }, { cat:'prime', key:'prime:0', label:'Não Prime' },
+  { sep:true },
+  { cat:'plus', key:'plus:1', label:'Conéctar+' }, { cat:'plus', key:'plus:0', label:'Sem Conéctar+' },
+  { sep:true },
+  { cat:'grp', key:'grp:1', label:'Em grupo' }, { cat:'grp', key:'grp:0', label:'Avulso' }
+];
+
+function recomputeMetrics(){
+  const opts = { mult: state.mult, drop: state.drop, holidays: state.holidays };
+  state.cutoff = state.ds.maxDay - 1;
+  state.metrics = [];
+  state.ds.clients.forEach(c => state.metrics.push(computeClient(c, state.cutoff, state.ds.maxDay, opts)));
+  routeGroups(state.metrics);
+}
+
+function visibleEntities(){
+  const q = state.q.trim().toLowerCase();
+  const units = state.metrics.filter(u => {
+    if (state.resp === '__none__'){ if (u.resp) return false; }
+    else if (state.resp && u.resp !== state.resp) return false;
+    if (state.grupo && u.grupo !== state.grupo) return false;
+    if (q && !(u.nome.toLowerCase().includes(q) || u.id.toLowerCase().includes(q) || (u.grupo && u.grupo.toLowerCase().includes(q)))) return false;
+    return true;
+  });
+  const byGroup = new Map(); const singles = [];
+  units.forEach(u => {
+    if (u.grupo){ if (!byGroup.has(u.grupo)) byGroup.set(u.grupo, []); byGroup.get(u.grupo).push(u); }
+    else singles.push(u);
+  });
+  let entities = [...singles];
+  byGroup.forEach((us, name) => entities.push(us.length > 1 ? consolidateGroup(name, us) : us[0]));
+  /* chips */
+  const sel = cat => CHIP_DEFS.filter(d => d.cat === cat && state.chips.has(d.key)).map(d => d.key);
+  const tiers = sel('tier'), primes = sel('prime'), pluses = sel('plus'), grps = sel('grp');
+  entities = entities.filter(e => {
+    if (tiers.length && !tiers.includes('tier:' + e.tier)) return false;
+    if (primes.length && !primes.includes('prime:' + (e.prime?1:0))) return false;
+    if (pluses.length && !pluses.includes('plus:' + (e.plus?1:0))) return false;
+    if (grps.length && !grps.includes('grp:' + (e.type==='group' || e.grupo ? 1 : 0))) return false;
+    return true;
+  });
+  return entities;
+}
+
+function sortEntities(arr){
+  const { key, dir } = state.sort;
+  const val = e => {
+    switch (key){
+      case 'nome': return e.nome.toLowerCase();
+      case 'tier': return e.tier ? TIER_RANK[e.tier] : null;
+      case 'base': return e.base;
+      case 'since': return e.since;
+      case 'deliv': return e.lastDeliv;
+      case 'delta': return e.delta;
+      case 'gmv': return e.gmvMonth;
+      default: return e.urg;
+    }
+  };
+  return [...arr].sort((a,b) => {
+    const va = val(a), vb = val(b);
+    if (va == null && vb == null) return 0;
+    if (va == null) return 1;
+    if (vb == null) return -1;
+    if (va < vb) return -1 * dir;
+    if (va > vb) return 1 * dir;
+    return b.urg - a.urg;
+  });
+}
+
+function pulseSVG(e){
+  const W = 124, H = 16, win = 42, start = state.cutoff - win + 1;
+  const ds = (e.days || []).filter(d => d >= start && d <= state.cutoff);
+  let ticks = '';
+  ds.forEach(d => {
+    const x = ((d - start) / (win - 1)) * (W - 6) + 3;
+    ticks += '<rect x="' + (x-1).toFixed(1) + '" y="3" width="2" height="10" rx="1"/>';
+  });
+  let gap = '';
+  const last = ds.length ? ds[ds.length-1] : null;
+  if (last != null && last < state.cutoff - 0.5){
+    const x1 = ((last - start) / (win - 1)) * (W - 6) + 3;
+    gap = '<line x1="' + x1.toFixed(1) + '" y1="8" x2="' + (W-3) + '" y2="8" stroke="var(--st-' + e.status + ')" stroke-width="2" stroke-linecap="round" opacity=".5"/>';
+  }
+  return '<svg class="pulse" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">' +
+    '<line x1="3" y1="8" x2="' + (W-3) + '" y2="8" stroke="currentColor" opacity=".13"/>' + gap +
+    '<g fill="currentColor" opacity=".8">' + ticks + '</g></svg>';
+}
+
+function sevChips(sc){
+  const P = { extremo:['extremo','extremos'], grave:['grave','graves'], medio:['médio','médios'], leve:['leve','leves'] };
+  let h = '';
+  for (const k of ['extremo','grave','medio','leve']){
+    if (sc[k]) h += '<span class="sev sev-' + k + '">' + sc[k] + ' ' + P[k][sc[k]>1?1:0] + '</span>';
+  }
+  return h ? '<span class="sev-chips" title="Falhas dos últimos 14 dias">' + h + '</span>' : '';
+}
+
+function tierBadge(t){
+  if (!t) return '<span class="cell">n/d</span>';
+  const cls = { 'G':'tier-G', 'M+':'tier-MP', 'M-':'tier-MM', 'P':'tier-P' }[t];
+  return '<span class="tier ' + cls + '">' + (t === 'M-' ? 'M−' : t) + '</span>';
+}
+
+function deltaCell(d){
+  if (d == null) return '<span class="cell">n/d</span>';
+  const p = Math.round(d*100);
+  if (p > 2) return '<span class="cell up">↑ ' + p + '%</span>';
+  if (p < -2) return '<span class="cell down">↓ ' + Math.abs(p) + '%</span>';
+  return '<span class="cell">' + (p>=0?'+':'') + p + '%</span>';
+}
+
+function rowHTML(e, isUnit){
+  const open = e.type === 'group' ? state.openGroups.has(e.id) : state.openDrill.has(e.id);
+  const tags = [];
+  if (e.prime) tags.push('<span class="tag tag-prime">Prime</span>');
+  if (e.type === 'group' && e.contagion) tags.push('<span class="tag tag-contagio">Contágio</span>');
+  if (isUnit && e.groupContagion) tags.push('<span class="tag tag-contagio">Contágio</span>');
+  if (isUnit && e.route === 'absorcao') tags.push('<span class="tag tag-absorcao">Irmã ativa</span>');
+  if (e.type === 'group') tags.push('<span class="tag tag-units">' + e.units.length + ' unidades</span>');
+  if (e.resp) tags.push('<span class="tag tag-resp">' + esc(e.resp) + '</span>');
+  else if (e.type !== 'group') tags.push('<span class="tag tag-grupo">Sem responsável</span>');
+  if (e.plus) tags.push('<span class="tag tag-plus">🍃 Conéctar+</span>');
+  if (e.type !== 'group' && e.grupo && !isUnit) tags.push('<span class="tag tag-grupo">' + esc(e.grupo) + '</span>');
+  return '<button class="row' + (e.prime ? ' is-prime' : '') + (e.route === 'absorcao' ? ' is-absorcao' : '') + (open ? ' open' : '') + '" style="--stc:var(--st-' + e.status + ')" ' +
+    'data-act="' + (e.type === 'group' ? 'group' : 'drill') + '" data-id="' + esc(e.id) + '" aria-expanded="' + open + '">' +
+    '<span class="car"><svg width="9" height="11" viewBox="0 0 9 11" fill="currentColor"><path d="M1 1.3v8.4c0 .8.9 1.3 1.6.8l6-4.2c.6-.4.6-1.3 0-1.7l-6-4.2C1.9 0 1 .5 1 1.3z"/></svg></span>' +
+    '<span class="cell-name"><span class="nm">' + (e.prime ? '<span class="star">★</span>' : '') + '<span class="txt">' + esc(e.nome) + '</span></span>' +
+    (tags.length ? '<span class="tags">' + tags.join('') + '</span>' : '') + '</span>' +
+    '<span>' + tierBadge(e.tier) + '</span>' +
+    '<span class="col-pulse">' + pulseSVG(e) + '</span>' +
+    '<span class="cell">' + (e.base != null ? '<strong>' + fmt1(e.base) + 'd</strong>' : 'n/d') + '</span>' +
+    '<span class="cell"><strong>' + e.since + 'd</strong></span>' +
+    '<span class="cell col-entrega">' + fmtDay(e.lastDeliv, false) + '</span>' +
+    '<span>' + deltaCell(e.delta) + '</span>' +
+    '<span class="cell">' + fmtBRL(e.gmvMonth) + '</span>' +
+    '<span class="cell-sinal"><span class="s-txt">' + esc(e.sinal) + '</span>' + sevChips(e.sevCount) + '</span>' +
+    '</button>';
+}
+
+function drillHTML(e){
+  const facts = [
+    ['Cadência base', e.base != null ? 'a cada ' + fmt1(e.base) + ' dias' : 'sem base'],
+    ['Limite antes do alerta', e.threshold != null ? fmt1(e.threshold) + ' dias' : 'n/d'],
+    ['Último pedido', e.last != null ? fmtDay(e.last, true) + ' (' + e.since + 'd)' : 'n/d'],
+    ['Última entrega', fmtDay(e.lastDeliv, true)],
+    ['GMV por mês', fmtBRL(e.gmvMonth)],
+    ['Últimas 4 semanas', fmtBRL(e.recent)],
+    ['4 semanas anteriores', e.prev > 0 ? fmtBRL(e.prev) : 'sem base'],
+    ['Histórico', e.hist + ' dias'],
+    ['Responsável', e.resp ? esc(e.resp) : 'Sem responsável'],
+    ['Grupo', e.grupo ? esc(e.grupo) : 'Avulso'],
+    ['Conéctar+', e.plus ? 'Sim' : 'Não']
+  ];
+  let fals = '';
+  if (!e.failures.length){
+    fals = '<p class="fal-none">Sem falhas registradas nos últimos 14 dias.</p>';
+  } else {
+    e.failures.forEach(f => {
+      const tags = f.tipos.map(t => {
+        const s = sevOf(t);
+        return '<span class="sev sev-' + s + '" title="' + SEV_LABEL[s] + '">' + esc(t) + '</span>';
+      }).join('');
+      fals += '<div class="fal"><div class="fal-h"><span class="fd num">' + fmtDay(f.day, false) + '</span>' +
+        (f.forn ? '<span class="ff">' + esc(f.forn) + '</span>' : '') + '</div>' +
+        '<div class="sev-chips">' + tags + '</div>' +
+        (f.obs ? '<p class="fal-obs">' + esc(f.obs) + '</p>' : '') + '</div>';
+    });
+  }
+  let routeBox = '';
+  if (e.contagion || e.groupContagion){
+    routeBox = '<div class="route-note rn-contagio"><b>Contágio de grupo.</b> Mais de uma unidade do grupo está fora de cadência ao mesmo tempo. Padrão de saída coordenada: escale ao tomador de decisão do grupo em vez de tratar unidade a unidade.</div>';
+  } else if (e.route === 'absorcao'){
+    routeBox = '<div class="route-note rn-absorcao"><b>Possível absorção por irmã.</b> ' + esc(e.routeNote) + '</div>';
+  } else if (e.tier === 'G' && e.gravePlus > 0){
+    routeBox = '<div class="route-note rn-falhag"><b>Falha em cliente G.</b> Churn por falha é específico do tier G. Resolver a falha tende a pesar mais aqui do que em P ou M. Priorizar a tratativa.</div>';
+  }
+  return '<div class="drill">' + routeBox + '<div class="drill-grid">' +
+    '<div><h4>Resumo</h4><div class="facts">' + facts.map(f => '<div class="fact"><span>' + f[0] + '</span><b>' + f[1] + '</b></div>').join('') + '</div></div>' +
+    '<div><h4>Falhas dos últimos 14 dias</h4><div class="fals">' + fals + '</div></div>' +
+    '</div></div>';
+}
+
+const HEADERS = [
+  ['nome','Cliente / Grupo'], ['tier','Tier'], ['_pulse','Pulso 6 sem'], ['base','Cadência'],
+  ['since','Dias sem pedir'], ['deliv','Última entrega'], ['delta','Δ Vol 4 sem'], ['gmv','GMV/mês'], ['urg','Sinal']
+];
+function theadHTML(){
+  let h = '<div class="thead"><span></span>';
+  HEADERS.forEach(([k, lbl]) => {
+    const extra = k === 'deliv' ? ' col-entrega' : (k === '_pulse' ? ' col-pulse' : '');
+    if (k === '_pulse'){ h += '<span class="' + extra.trim() + '"><button disabled style="cursor:default">' + lbl + '</button></span>'; return; }
+    const on = state.sort.key === k;
+    h += '<span class="' + extra.trim() + '"><button data-sort="' + k + '" class="' + (on?'on':'') + '" aria-sort="' + (on ? (state.sort.dir>0?'ascending':'descending') : 'none') + '">' +
+      lbl + (on ? '<span class="arr">' + (state.sort.dir>0?'▲':'▼') + '</span>' : '') + '</button></span>';
+  });
+  return h + '</div>';
+}
+
+function render(){
+  const entities = visibleEntities();
+  const counts = { critico:0, risco:0, atencao:0, novo:0, ok:0 };
+  let gmvRisk = 0;
+  entities.forEach(e => {
+    counts[e.status]++;
+    if (e.type === 'group'){
+      e.units.forEach(u => { if (u.status==='critico' || u.status==='risco') gmvRisk += (u.gmvMonth||0); });
+    } else if (e.status==='critico' || e.status==='risco'){
+      gmvRisk += (e.gmvMonth||0);
+    }
+  });
+  const total = entities.length;
+  const acao = counts.critico + counts.risco;
+
+  /* KPIs */
+  const sf = state.statusFilter;
+  const kOn = sts => sts.every(s => sf.has(s)) && sf.size > 0;
+  $('#kpis').innerHTML =
+    kpi('total', 'Na visão', total, total === 1 ? 'cliente ou grupo' : 'clientes e grupos', '', sf.size === 0) +
+    kpi('acao', 'Precisam de ação', acao, counts.critico + (counts.critico===1?' crítico':' críticos') + ' · ' + counts.risco + ' em risco', 'k-acao', kOn(['critico','risco'])) +
+    kpi('gmv', 'GMV em risco', fmtBRLk(gmvRisk), acao + (acao===1?' conta':' contas') + ' fora de cadência', 'k-gmv', kOn(['critico','risco'])) +
+    kpi('atencao', 'Em atenção', counts.atencao, 'começando a escorregar', 'k-atencao', kOn(['atencao'])) +
+    kpi('ok', 'Na cadência', counts.ok, total ? Math.round(counts.ok/total*100) + '% da visão' : '', 'k-ok', kOn(['ok'])) +
+    kpi('novo', 'Novos', counts.novo, 'até 30d de histórico', 'k-novo', kOn(['novo']));
+
+  /* Distro bar */
+  let db = '';
+  [['critico','Críticos'],['risco','Em risco'],['atencao','Em atenção'],['novo','Novos'],['ok','Na cadência']].forEach(([s, lbl]) => {
+    if (!counts[s]) return;
+    const dim = sf.size > 0 && !sf.has(s);
+    db += '<button data-st="' + s + '" class="' + (dim?'dim':'') + '" style="flex-grow:' + counts[s] + ';background:var(--st-' + s + ')" title="' + lbl + ': ' + counts[s] + '" aria-label="' + lbl + ': ' + counts[s] + '"></button>';
+  });
+  $('#distro').innerHTML = db || '<button disabled style="flex-grow:1;background:var(--line)"></button>';
+
+  /* Blocks */
+  let bh = '';
+  BLOCKS.forEach(b => {
+    let list = entities.filter(e => b.statuses.includes(e.status));
+    if (sf.size > 0) list = list.filter(e => sf.has(e.status));
+    if (sf.size > 0 && !list.length) return;
+    list = sortEntities(list);
+    const open = state.openBlocks.has(b.key);
+    let rows = '';
+    list.forEach(e => {
+      rows += '<div class="rowwrap">' + rowHTML(e, false);
+      if (e.type === 'group' && state.openGroups.has(e.id)){
+        let uh = '';
+        sortEntities(e.units).forEach(u => {
+          uh += '<div class="rowwrap">' + rowHTML(u, true) + (state.openDrill.has(u.id) ? drillHTML(u) : '') + '</div>';
+        });
+        rows += '<div class="units">' + uh + '</div>';
+      } else if (e.type !== 'group' && state.openDrill.has(e.id)){
+        rows += drillHTML(e);
+      }
+      rows += '</div>';
+    });
+    bh += '<div class="block' + (open?' open':'') + '" data-block="' + b.key + '">' +
+      '<button class="blk-h" data-act="block" data-id="' + b.key + '" aria-expanded="' + open + '">' +
+      '<span class="car"><svg width="9" height="11" viewBox="0 0 9 11" fill="currentColor"><path d="M1 1.3v8.4c0 .8.9 1.3 1.6.8l6-4.2c.6-.4.6-1.3 0-1.7l-6-4.2C1.9 0 1 .5 1 1.3z"/></svg></span>' +
+      '<span class="ttl" style="color:' + b.col + '">' + b.title + '</span>' +
+      '<span class="cnt" style="background:' + b.soft + ';color:' + b.col + '">' + list.length + '</span>' +
+      '<span class="desc">' + b.desc + '</span></button>' +
+      '<div class="blk-body">' + (list.length ? '<div class="tscroll">' + theadHTML() + rows + '</div>' : '<p class="blk-empty">Nenhum cliente aqui com os filtros atuais.</p>') + '</div>' +
+      '</div>';
+  });
+  $('#blocks').innerHTML = bh;
+
+  /* Cobertura por responsável */
+  const cw = $('#coverWrap');
+  if (state.coverOpen){
+    cw.classList.add('open');
+    $('#btnCover').setAttribute('aria-expanded','true');
+    $('#coverBody').hidden = false;
+    $('#coverBody').innerHTML = coverHTML(buildCoverage());
+  } else {
+    cw.classList.remove('open');
+    $('#btnCover').setAttribute('aria-expanded','false');
+    $('#coverBody').hidden = true;
+  }
+
+  $('#cfgSummary').textContent = fmt1(state.mult) + 'x · ' + Math.round(state.drop*100) + '% · ' + state.holidays.size + (state.holidays.size === 1 ? ' feriado' : ' feriados');
+  $('#legendNote').textContent = 'Corte: ' + fmtDay(state.cutoff, true) + ' (dia atual fora da conta) · limite = base × ' + fmt1(state.mult) + ', piso base + 1d · queda forte ≥ ' + Math.round(state.drop*100) + '%';
+}
+
+function buildCoverage(){
+  const byR = new Map();
+  state.metrics.forEach(u => {
+    const k = u.resp || '__none__';
+    if (!byR.has(k)) byR.set(k, { key:k, resp: u.resp || 'Sem responsável', tot:0, critico:0, risco:0, atencao:0, novo:0, ok:0, gmvRisk:0 });
+    const o = byR.get(k);
+    o.tot++; o[u.status]++;
+    if (u.status==='critico' || u.status==='risco') o.gmvRisk += (u.gmvMonth||0);
+  });
+  const rows = [...byR.values()];
+  rows.sort((a,b) => {
+    const an = a.key==='__none__', bn = b.key==='__none__';
+    if (an !== bn) return an ? 1 : -1;
+    return b.gmvRisk - a.gmvRisk;
+  });
+  return rows;
+}
+
+function coverHTML(rows){
+  if (!rows.length) return '<p class="blk-empty">Sem dados de carteira.</p>';
+  let h = '<table class="cover-tbl"><thead><tr>' +
+    '<th>Responsável</th><th>Carteira</th><th>Crítico</th><th>Risco</th><th>Atenção</th><th>Na cadência</th><th>GMV em risco</th>' +
+    '</tr></thead><tbody>';
+  rows.forEach(r => {
+    h += '<tr data-cover="' + esc(r.key) + '"' + (r.key==='__none__' ? ' class="cover-none"' : '') + '>' +
+      '<td class="c-resp">' + esc(r.resp) + '</td>' +
+      '<td>' + r.tot + '</td>' +
+      '<td class="' + (r.critico?'c-crit':'') + '">' + r.critico + '</td>' +
+      '<td class="' + (r.risco?'c-risc':'') + '">' + r.risco + '</td>' +
+      '<td class="' + (r.atencao?'c-att':'') + '">' + r.atencao + '</td>' +
+      '<td>' + r.ok + '</td>' +
+      '<td class="c-gmv">' + fmtBRLk(r.gmvRisk) + '</td>' +
+    '</tr>';
+  });
+  return h + '</tbody></table>';
+}
+
+function kpi(key, lbl, val, sub, cls, on){
+  return '<button class="kpi ' + (cls||'') + (on?' on':'') + '" data-kpi="' + key + '"><span class="dot"></span>' +
+    '<span class="lbl">' + lbl + '</span><div class="val">' + (typeof val === 'number' ? fmtInt(val) : val) + '</div><div class="sub">' + sub + '</div></button>';
+}
+
+/* ===================== Eventos ===================== */
+function loadText(text, name){
+  const ds = buildDataset(text);
+  const errEl = $('#loadErr');
+  if (ds.error){ errEl.textContent = ds.error; errEl.hidden = false; return; }
+  errEl.hidden = true;
+  state.ds = ds; state.fileName = name;
+  state.q = ''; $('#q').value = '';
+  state.resp = ''; state.grupo = '';
+  state.chips.clear(); state.statusFilter.clear();
+  state.openGroups.clear(); state.openDrill.clear();
+  state.openBlocks = new Set(['acao','atencao']);
+  state.coverOpen = false;
+  recomputeMetrics();
+
+  /* selects */
+  const resps = [...new Set(state.metrics.map(m => m.resp).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  $('#selResp').innerHTML = '<option value="">Responsável: todos</option>' +
+    resps.map(r => '<option value="' + esc(r) + '">' + esc(r) + '</option>').join('') +
+    '<option value="__none__">Sem responsável</option>';
+  const grupos = [...new Set(state.metrics.map(m => m.grupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  $('#selGrupo').innerHTML = '<option value="">Grupo: todos</option>' +
+    grupos.map(g => '<option value="' + esc(g) + '">' + esc(g) + '</option>').join('');
+
+  /* chips */
+  $('#chips').innerHTML = CHIP_DEFS.map(d => d.sep ? '<span class="chip-sep"></span>' :
+    '<button class="chip ' + (d.cls||'') + '" data-chip="' + d.key + '">' + d.label + '</button>').join('');
+
+  $('#metaFile').textContent = name;
+  $('#metaInfo').textContent = fmtInt(ds.used) + ' pedidos · ' + fmtInt(ds.clients.size) + ' clientes · corte ' + fmtDay(state.ds.maxDay - 1, true) +
+    (ds.ignored ? ' · ' + fmtInt(ds.ignored) + ' linhas de teste ignoradas' : '');
+  $('#mastMeta').hidden = false;
+  $('#setup').hidden = true;
+  $('#board').hidden = false;
+  render();
+}
+
+function readFile(file){
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = () => loadText(String(r.result), file.name);
+  r.onerror = () => { const e = $('#loadErr'); e.textContent = 'Não foi possível ler o arquivo. Tente novamente.'; e.hidden = false; };
+  r.readAsText(file, 'utf-8');
+}
+
+$('#btnPick').addEventListener('click', () => $('#fileInput').click());
+$('#btnSwap').addEventListener('click', () => $('#fileInput').click());
+$('#fileInput').addEventListener('change', e => { readFile(e.target.files[0]); e.target.value = ''; });
+
+const dz = $('#dropZone');
+['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('over'); }));
+['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('over'); }));
+dz.addEventListener('drop', e => readFile(e.dataTransfer.files[0]));
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => e.preventDefault());
+
+let qTimer;
+$('#q').addEventListener('input', e => {
+  clearTimeout(qTimer);
+  qTimer = setTimeout(() => { state.q = e.target.value; render(); }, 160);
+});
+$('#selResp').addEventListener('change', e => { state.resp = e.target.value; render(); });
+$('#selGrupo').addEventListener('change', e => { state.grupo = e.target.value; render(); });
+
+$('#btnCover').addEventListener('click', () => { state.coverOpen = !state.coverOpen; render(); });
+$('#coverBody').addEventListener('click', e => {
+  const tr = e.target.closest('[data-cover]');
+  if (!tr) return;
+  const v = tr.dataset.cover;
+  state.resp = state.resp === v ? '' : v;
+  $('#selResp').value = state.resp;
+  render();
+});
+
+$('#chips').addEventListener('click', e => {
+  const b = e.target.closest('[data-chip]');
+  if (!b) return;
+  const k = b.dataset.chip;
+  state.chips.has(k) ? state.chips.delete(k) : state.chips.add(k);
+  b.classList.toggle('on');
+  render();
+});
+
+$('#kpis').addEventListener('click', e => {
+  const b = e.target.closest('[data-kpi]');
+  if (!b) return;
+  const map = { total:[], acao:['critico','risco'], gmv:['critico','risco'], atencao:['atencao'], ok:['ok'], novo:['novo'] };
+  const sts = map[b.dataset.kpi];
+  if (!sts.length){ state.statusFilter.clear(); }
+  else {
+    const allOn = sts.every(s => state.statusFilter.has(s));
+    if (allOn) sts.forEach(s => state.statusFilter.delete(s));
+    else sts.forEach(s => state.statusFilter.add(s));
+  }
+  render();
+});
+$('#distro').addEventListener('click', e => {
+  const b = e.target.closest('[data-st]');
+  if (!b) return;
+  const s = b.dataset.st;
+  state.statusFilter.has(s) ? state.statusFilter.delete(s) : state.statusFilter.add(s);
+  render();
+});
+
+$('#btnCfg').addEventListener('click', () => {
+  const p = $('#settings');
+  p.hidden = !p.hidden;
+  $('#btnCfg').setAttribute('aria-expanded', String(!p.hidden));
+});
+$('#multRange').addEventListener('input', e => {
+  state.mult = parseFloat(e.target.value);
+  $('#multVal').textContent = fmt1(state.mult);
+  recomputeMetrics(); render();
+});
+$('#dropRange').addEventListener('input', e => {
+  state.drop = parseFloat(e.target.value) / 100;
+  $('#dropVal').textContent = Math.round(state.drop*100);
+  recomputeMetrics(); render();
+});
+$('#holAdd').addEventListener('click', () => {
+  const d = dayFromISO($('#holDate').value);
+  if (d == null) return;
+  state.holidays.add(d);
+  $('#holDate').value = '';
+  renderHolidays(); recomputeMetrics(); render();
+});
+function renderHolidays(){
+  const el = $('#holList');
+  if (!state.holidays.size){ el.innerHTML = '<span class="hol-empty">Nenhuma data marcada.</span>'; return; }
+  el.innerHTML = [...state.holidays].sort((a,b)=>a-b).map(d =>
+    '<span class="hol-tag">' + fmtDay(d, true) + '<button data-hol="' + d + '" aria-label="Remover ' + fmtDay(d, true) + '">✕</button></span>').join('');
+}
+$('#holList').addEventListener('click', e => {
+  const b = e.target.closest('[data-hol]');
+  if (!b) return;
+  state.holidays.delete(+b.dataset.hol);
+  renderHolidays(); recomputeMetrics(); render();
+});
+
+$('#blocks').addEventListener('click', e => {
+  const sb = e.target.closest('[data-sort]');
+  if (sb){
+    const k = sb.dataset.sort;
+    if (state.sort.key === k) state.sort.dir *= -1;
+    else state.sort = { key: k, dir: (k === 'nome' || k === 'base') ? 1 : -1 };
+    render(); return;
+  }
+  const b = e.target.closest('[data-act]');
+  if (!b) return;
+  const { act, id } = b.dataset;
+  const toggle = (set) => set.has(id) ? set.delete(id) : set.add(id);
+  if (act === 'block') toggle(state.openBlocks);
+  else if (act === 'group') toggle(state.openGroups);
+  else if (act === 'drill') toggle(state.openDrill);
+  render();
+});
+
+/* init */
+$('#multVal').textContent = fmt1(state.mult);
+$('#dropVal').textContent = Math.round(state.drop*100);
+renderHolidays();
+</script>
+</body>
+</html>
